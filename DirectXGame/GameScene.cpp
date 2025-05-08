@@ -34,7 +34,8 @@ void GameScene::Update() {
 
 		// フェード処理
 		KamataEngine::Vector4 color = particle->GetColor();
-		float alpha = std::clamp(1.0f - particle->GetCounter() / particle->GetDuration(), 0.0f, 1.0f);
+		float alpha = 
+			std::clamp(1.0f - particle->GetCounter() / particle->GetDuration(), 0.0f, 1.0f);
 		color.w = alpha;
 		particle->SetColor(color);
 	}
@@ -51,7 +52,11 @@ void GameScene::Update() {
 	// 確率で発生
 	if (rand() % 20 == 0) {
 		// 発生位置は乱数
-		KamataEngine::Vector3 position = {distribution(randomEngine) * 30.0f, distribution(randomEngine) * 20.0f, 0};
+		KamataEngine::Vector3 position = 
+		{distribution(randomEngine) * 30.0f,
+			distribution(randomEngine) * 20.0f,
+			0
+		};
 		// パーティクルの生成
 		ParticleBorn(position);
 	}
@@ -85,8 +90,17 @@ void GameScene::ParticleBorn(KamataEngine::Vector3 position) {
 		velocity *= distribution(randomEngine);
 		velocity *= 0.1f;
 
+		//パーティクルの色
+		KamataEngine::Vector4 color = {
+		    distribution(randomEngine) * 0.8f + 0.2f, // R
+		    distribution(randomEngine) * 0.8f + 0.2f, // G
+		    distribution(randomEngine) * 0.8f + 0.2f, // B
+		    1.0f                                      // A
+		};
+
 		// 初期化（引数のpositionを使う）
 		particle->Initialize(modelParticle_, position, velocity);
+		particle->SetColor(color); // ← 色を設定！
 
 		// リストに追加
 		particles_.push_back(particle);

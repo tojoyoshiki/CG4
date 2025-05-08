@@ -1,6 +1,6 @@
 #include "GameScene.h"
-#include <random>
 #include <algorithm>
+#include <random>
 
 using namespace KamataEngine;
 using namespace MathUtility;
@@ -14,7 +14,7 @@ GameScene::GameScene() {}
 GameScene::~GameScene() {
 	delete modelParticle_;
 	for (Particle* particle : particles_) {
-	delete particle;
+		delete particle;
 	}
 	particles_.clear();
 }
@@ -24,24 +24,8 @@ void GameScene::Initialize() {
 	modelParticle_ = Model::CreateSphere(4, 4);
 	// cameraの初期化
 	camera_.Initialize();
-	// particleの生成
-	for (int i = 0; i < 150; i++) {
-     	//生成
-		Particle* particle = new Particle();
-		//位置
-		KamataEngine::Vector3 position = {0.0, 0.0f, 0.0f};
-	    //移動量
-		KamataEngine::Vector3 velocity = 
-		{distribution(randomEngine), 
-			distribution(randomEngine), 0};
-		//初期化
-		particle->Initialize(modelParticle_, position, velocity);
-		//リストに追加
-		particles_.push_back(particle);
-		Normalize(velocity);
-		velocity *= distribution(randomEngine);
-		velocity *= 0.1f;
-	}
+
+	srand((unsigned)time(NULL));
 }
 
 void GameScene::Update() {
@@ -63,6 +47,14 @@ void GameScene::Update() {
 		}
 		return false;
 	});
+
+	// 確率で発生
+	if (rand() % 20 == 0) {
+		// 発生位置は乱数
+		KamataEngine::Vector3 position = {distribution(randomEngine) * 30.0f, distribution(randomEngine) * 20.0f, 0};
+		// パーティクルの生成
+		ParticleBorn(position);
+	}
 }
 
 void GameScene::Draw() {
@@ -73,8 +65,30 @@ void GameScene::Draw() {
 	Model::PreDraw(dxCommon->GetCommandList());
 	// ぱーてぃくるびょうが　
 	for (Particle* particle : particles_) {
-	particle->Draw(camera_);
+		particle->Draw(camera_);
 	}
 	// 3dモデル描画後処理
 	Model::PostDraw();
+}
+
+void GameScene::ParticleBorn(KamataEngine::Vector3 position) {
+	// particleの生成
+	for (int i = 0; i < 150; i++) {
+		// 生成
+		Particle* particle = new Particle();
+
+		// 移動量
+		KamataEngine::Vector3 velocity = {distribution(randomEngine), distribution(randomEngine), 0};
+
+		// 移動量の正規化と調整
+		Normalize(velocity);
+		velocity *= distribution(randomEngine);
+		velocity *= 0.1f;
+
+		// 初期化（引数のpositionを使う）
+		particle->Initialize(modelParticle_, position, velocity);
+
+		// リストに追加
+		particles_.push_back(particle);
+	}
 }

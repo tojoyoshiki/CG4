@@ -19,7 +19,6 @@ void Particle::Initialize(KamataEngine::Model* model,
 	//受け取った移動量をメンバ変数に代入する
 	velocity_ = velocity;
 
-
 	// 色の設定
 	objectColor_.Initialize();
 	color_ = {1, 1, 0, 1};
@@ -53,5 +52,4 @@ void Particle::Update() {
 }
 
 void Particle::Draw(KamataEngine::Camera& camera) {
-	model_->Draw(worldTransform_, camera, &objectColor_);
-}
+	model_->Draw(worldTransform_, camera, &objectColor_); }

@@ -10,10 +10,9 @@ public:
 		KamataEngine::Vector3 position, KamataEngine::Vector3 velocity);
 	void Update();
 	void Draw(KamataEngine::Camera& camera);
-	
+
 	//getter
 	bool IsFinished() { return isFinished_;	}
-
 	// color ゲッター／セッター
 	KamataEngine::Vector4 GetColor() const { return color_; }
 	void SetColor(const KamataEngine::Vector4& color) { color_ = color; }

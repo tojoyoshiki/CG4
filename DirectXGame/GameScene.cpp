@@ -29,13 +29,13 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
+	// パーティクル更新
 	for (Particle* particle : particles_) {
 		particle->Update();
 
 		// フェード処理
 		KamataEngine::Vector4 color = particle->GetColor();
-		float alpha = 
-			std::clamp(1.0f - particle->GetCounter() / particle->GetDuration(), 0.0f, 1.0f);
+		float alpha = std::clamp(1.0f - particle->GetCounter() / particle->GetDuration(), 0.0f, 1.0f);
 		color.w = alpha;
 		particle->SetColor(color);
 	}
@@ -49,15 +49,9 @@ void GameScene::Update() {
 		return false;
 	});
 
-	// 確率で発生
+	// 確率で新しいパーティクルを生成
 	if (rand() % 20 == 0) {
-		// 発生位置は乱数
-		KamataEngine::Vector3 position = 
-		{distribution(randomEngine) * 30.0f,
-			distribution(randomEngine) * 20.0f,
-			0
-		};
-		// パーティクルの生成
+		KamataEngine::Vector3 position = {distribution(randomEngine) * 30.0f, distribution(randomEngine) * 20.0f, 0};
 		ParticleBorn(position);
 	}
 }
@@ -77,30 +71,23 @@ void GameScene::Draw() {
 }
 
 void GameScene::ParticleBorn(KamataEngine::Vector3 position) {
-	// particleの生成
 	for (int i = 0; i < 150; i++) {
-		// 生成
 		Particle* particle = new Particle();
-
-		// 移動量
 		KamataEngine::Vector3 velocity = {distribution(randomEngine), distribution(randomEngine), 0};
-
-		// 移動量の正規化と調整
 		Normalize(velocity);
 		velocity *= distribution(randomEngine);
 		velocity *= 0.1f;
 
-		//パーティクルの色
+		// ランダムな色
 		KamataEngine::Vector4 color = {
 		    distribution(randomEngine) * 0.8f + 0.2f, // R
 		    distribution(randomEngine) * 0.8f + 0.2f, // G
 		    distribution(randomEngine) * 0.8f + 0.2f, // B
-		    1.0f                                      // A
-		};
+		    1.0f};
 
-		// 初期化（引数のpositionを使う）
+		// 初期化
 		particle->Initialize(modelParticle_, position, velocity);
-		particle->SetColor(color); // ← 色を設定！
+		particle->SetColor(color);
 
 		// リストに追加
 		particles_.push_back(particle);

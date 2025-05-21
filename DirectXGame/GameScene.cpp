@@ -29,16 +29,6 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-	// パーティクル更新
-	for (Particle* particle : particles_) {
-		particle->Update();
-
-		// フェード処理
-		KamataEngine::Vector4 color = particle->GetColor();
-		float alpha = std::clamp(1.0f - particle->GetCounter() / particle->GetDuration(), 0.0f, 1.0f);
-		color.w = alpha;
-		particle->SetColor(color);
-	}
 
 	// 終了フラグが立ったパーティクルを削除
 	particles_.remove_if([](Particle* particle) {
@@ -53,6 +43,17 @@ void GameScene::Update() {
 	if (rand() % 20 == 0) {
 		KamataEngine::Vector3 position = {distribution(randomEngine) * 30.0f, distribution(randomEngine) * 20.0f, 0};
 		ParticleBorn(position);
+	}
+
+		// パーティクル更新
+	for (Particle* particle : particles_) {
+		particle->Update();
+
+		// フェード処理
+		KamataEngine::Vector4 color = particle->GetColor();
+		float alpha = std::clamp(1.0f - particle->GetCounter() / particle->GetDuration(), 0.0f, 1.0f);
+		color.w = alpha;
+		particle->SetColor(color);
 	}
 }
 

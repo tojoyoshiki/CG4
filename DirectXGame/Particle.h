@@ -1,5 +1,6 @@
 #pragma once
 #include <KamataEngine.h>
+#include <random>
 
 class Particle {
 public:
@@ -10,6 +11,8 @@ public:
 		KamataEngine::Vector3 position, KamataEngine::Vector3 velocity);
 	void Update();
 	void Draw(KamataEngine::Camera& camera);
+
+//	void MakeNewParticle(std::mt19937& randomEngine, const KamataEngine::Vector3& translate);
 
 	//getter
 	bool IsFinished() { return isFinished_;	}

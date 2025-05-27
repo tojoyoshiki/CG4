@@ -54,3 +54,4 @@ void Particle::Update() {
 void Particle::Draw(KamataEngine::Camera& camera) {
 	model_->Draw(worldTransform_, camera, &objectColor_); 
 }
+

@@ -9,7 +9,7 @@ Particle::~Particle() {}
 
 void Particle::Initialize(KamataEngine::Model* model,
 	KamataEngine::Vector3 position, KamataEngine::Vector3 velocity) {
-	assert(model);
+	//assert(model);
 
 	model_ = model; // 引数から受け取ったデータをメンバ変数に記録する
 	worldTransform_.translation_ = position;

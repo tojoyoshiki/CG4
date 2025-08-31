@@ -48,8 +48,7 @@ void GameScene::Initialize() {
 	player_ = new Player();
 	player_->Initialize(playerModel_);
 
-	graph_ = new Graph();
-	graph_->Initialize();
+	
 }
 
 void GameScene::Update() {
@@ -81,7 +80,6 @@ void GameScene::Update() {
 	titleScene_->Update();
 	stage_->Update();
 	player_->Update();
-	graph_->Update();
 }
 
 void GameScene::Draw() {
@@ -90,9 +88,9 @@ void GameScene::Draw() {
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 
 	Sprite::PreDraw(dxCommon->GetCommandList());
-	//titleScene_->Draw();
+
 	stage_->Draw();
-	graph_->Draw();
+	player_->SpriteDraw();
 
 	Sprite::PostDraw();
 
@@ -108,7 +106,6 @@ void GameScene::Draw() {
 	// 3Dモデル描画後処理
 	Model::PostDraw();
 
-	
 
 }
 

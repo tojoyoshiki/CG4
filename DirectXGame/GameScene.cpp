@@ -1,96 +1,124 @@
 #include "GameScene.h"
-#include <algorithm>
-#include <random>
-
 using namespace KamataEngine;
-using namespace MathUtility;
-
+#include <random>
 std::random_device seedGenerator;
 std::mt19937 randomEngine(seedGenerator());
 std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+using namespace MathUtility;
+
 
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
-	delete modelParticle_;
-	for (Particle* particle : particles_) {
-		delete particle;
-	}
-	particles_.clear();
+
+	delete titleScene_;
+	delete stage_;
+	Model2::StaticFinalize();
+	
 }
 
 void GameScene::Initialize() {
-	// 3dモデルデータの生成
-	modelParticle_ = Model::CreateSphere(4, 4);
-	// cameraの初期化
-	camera_.Initialize();
+	// 3Dモデルデータの生成
+	modelEffect_ = Model::CreateSphere(2, 2);
 
+	//カメラの初期化
+	camera_. Initialize();
+	
+	Normalize(velocity);
+	velocity *= distribution(randomEngine);
+	velocity *= 0.1f;
+
+	//乱数の初期化
 	srand((unsigned)time(NULL));
+	
+	Model2::StaticInitialize();
+	model2_ = Model2::CreateSphere(2, 2);
+	model2_ = Model2::CreateSquare();
+	camera_.Initialize();
+	worldTransform_.Initialize();
+
+	titleScene_ = new TitleScene();
+	titleScene_->Initialize();
+
+	stage_ = new Stage();
+	stage_->Initialize();
+
 }
 
 void GameScene::Update() {
 
-	// 終了フラグが立ったパーティクルを削除
-	particles_.remove_if([](Particle* particle) {
-		if (particle->IsFinished()) {
-			delete particle;
-			return true;
-		}
-		return false;
-	});
-
-	// 確率で新しいパーティクルを生成
+	// 確率で発生
 	if (rand() % 20 == 0) {
-		KamataEngine::Vector3 position = {distribution(randomEngine) * 30.0f, distribution(randomEngine) * 20.0f, 0};
-		ParticleBorn(position);
+		// 発生位置は乱数
+		Vector3 position = {distribution(randomEngine) * 30.0f, distribution(randomEngine) * 20.0f, 0};
+
+		//パーティクル発生
+		EffectBorn(position);
+	
 	}
 
-		// パーティクル更新
-	for (Particle* particle : particles_) {
-		particle->Update();
-
-		// フェード処理
-		KamataEngine::Vector4 color = particle->GetColor();
-		float alpha = std::clamp(1.0f - particle->GetCounter() / particle->GetDuration(), 0.0f, 1.0f);
-		color.w = alpha;
-		particle->SetColor(color);
+	// 終了フラグの立ったパーティクルを削除
+	effects_.remove_if([](Effect* effect) {
+		if (effect->IsFinished()) {
+			delete effect; // メモリ解放
+			return true;     // 削除する
+		}
+		return false; // 削除しない
+	});
+	
+	// パーティクルの更新
+	for (Effect* effect : effects_) {
+		effect->Update();
 	}
+
+	titleScene_->Update();
+	stage_->Update();
 }
 
 void GameScene::Draw() {
-
-	// DXCommonインスタンスの取得
+	//DirectXCommonインスタンスの取得
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
-	// 3Dモデル描画前処理
-	Model::PreDraw(dxCommon->GetCommandList());
-	// ぱーてぃくるびょうが　
-	for (Particle* particle : particles_) {
-		particle->Draw(camera_);
-	}
-	// 3dモデル描画後処理
-	Model::PostDraw();
+
+	//3Dモデル描画前処理
+	Model2::PreDraw(dxCommon->GetCommandList());
+
+	//model2_->Draw(worldTransform_, camera_);
+
+	// 3Dモデル描画後処理
+	Model2::PostDraw();
+
+	Sprite::PreDraw(dxCommon->GetCommandList());
+	titleScene_->Draw();
+	stage_->Draw();
+	Sprite::PostDraw();
+
 }
 
-void GameScene::ParticleBorn(KamataEngine::Vector3 position) {
-	for (int i = 0; i < 150; i++) {
-		Particle* particle = new Particle();
-		KamataEngine::Vector3 velocity = {distribution(randomEngine), distribution(randomEngine), 0};
-		Normalize(velocity);
-		velocity *= distribution(randomEngine);
-		velocity *= 0.1f;
+void GameScene::EffectBorn(KamataEngine::Vector3 position) {
+	for (int i = 0; i < 10; i++) {
+		// パーティクルの生成
+		Effect* effect = new Effect();
+		// 位置
+		Vector3 position_ = position;
 
-		// ランダムな色
-		KamataEngine::Vector4 color = {
-		    distribution(randomEngine) * 0.8f + 0.2f, // R
-		    distribution(randomEngine) * 0.8f + 0.2f, // G
-		    distribution(randomEngine) * 0.8f + 0.2f, // B
-		    1.0f};
+		float size = abs(distribution(randomEngine) * 5.0f);
+		float rotation = (distribution(randomEngine) * 3.0f);
 
-		// 初期化
-		particle->Initialize(modelParticle_, position, velocity);
-		particle->SetColor(color);
 
+		// 移動量
+		velocity = {distribution(randomEngine), distribution(randomEngine), 0};
+		// パーティクルの初期化
+		effect->Initialize(modelEffect_, position_, velocity,size,rotation);
 		// リストに追加
-		particles_.push_back(particle);
+		effects_.push_back(effect);
+
+		// ランダムな色を生成（0.0～1.0の範囲）
+		float r = static_cast<float>(rand()) / RAND_MAX;
+		float g = static_cast<float>(rand()) / RAND_MAX;
+		float b = static_cast<float>(rand()) / RAND_MAX;
+
+		// 色をランダムに設定
+		effect->color_ = {r, g, b};
+
 	}
 }

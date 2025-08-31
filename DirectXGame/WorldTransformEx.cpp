@@ -1,22 +1,27 @@
+//#include"MathUtilityForText.h"
+//#include"WorldTransform.h"
 #include <KamataEngine.h>
-#include <math/MathUtility.h>
 
-using namespace KamataEngine::MathUtility;
+using namespace KamataEngine;
+using namespace MathUtility;
 
-void KamataEngine::WorldTransform::UpdateMatrix() {
-	// スケーリング行列の作成
-	Matrix4x4 matScale = MathUtility::MakeScaleMatrix(scale_);
+void WorldTransform::UpdateMatrix() {
+	////スケール、回転、平行移動を合成して行列を計算する
+	//matWorld_ = MakeAffineMatrix(scale_, rotation_, translation_);
 
-	// 回転行列の作成
-	Matrix4x4 matRotX = MathUtility::MakeRotateXMatrix(rotation_.x);
-	Matrix4x4 matRotY = MathUtility::MakeRotateYMatrix(rotation_.y);
-	Matrix4x4 matRotZ = MathUtility::MakeRotateZMatrix(rotation_.z);
-	Matrix4x4 matRot = matRotZ * matRotX * matRotY;
+	//　スケーリング行列の作成
+	Matrix4x4 matScale = MakeScaleMatrix(scale_);
 
-	// 平行移動行列の作成
-	Matrix4x4 matTrans = MathUtility::MakeTranslateMatrix(translation_);
+	// 　回転行列の作成
+	Matrix4x4 matRotX = MakeRotateXMatrix(rotation_.x);
+	Matrix4x4 matRotY = MakeRotateYMatrix(rotation_.y);
+	Matrix4x4 matRotZ = MakeRotateZMatrix(rotation_.z);
+	Matrix4x4 matRot = matRotZ * matRotY * matRotX;
 
-	//スケーリング、回転、平行移動の合成
+	// 　平行移動行列の作成
+	Matrix4x4 matTrans = MakeTranslateMatrix(translation_);
+
+	// スケーリング、回転、平行移動を合成して行列を計算する
 	matWorld_ = matScale * matRot * matTrans;
 
 	//定数バッファに転送する

@@ -1,57 +1,69 @@
 #include "Particle.h"
-#include "math/MathUtility.h"
+using namespace KamataEngine;
+using namespace MathUtility;
+#include <algorithm>
+#include <cassert>
 
-using namespace KamataEngine::MathUtility;
 
 Particle::Particle() {}
 
 Particle::~Particle() {}
 
-void Particle::Initialize(KamataEngine::Model* model,
-	KamataEngine::Vector3 position, KamataEngine::Vector3 velocity) {
-	//assert(model);
+void Particle::Initialize(Model* model, Vector3 position, Vector3 velocity) {
+	//NULLポインタチェック
+	assert(model);
 
-	model_ = model; // 引数から受け取ったデータをメンバ変数に記録する
-	worldTransform_.translation_ = position;
-	worldTransform_.Initialize(); // ワールド変換の初期化
-	worldTransform_.scale_ = {0.2f, 0.2f, 0.2f}; // 大きさを調整
+	// 引数として受け取ったデータをメンバ変数に記録する
+	model_ = model;
 
-	//受け取った移動量をメンバ変数に代入する
-	velocity_ = velocity;
+	// ワールド変換の初期化
+	worldTransform_.Initialize();
 
-	// 色の設定
+	//色の設定
 	objectColor_.Initialize();
 	color_ = {1, 1, 0, 1};
+
+	worldTransform_.translation_ = position;
+
+	velocity_ = velocity;
+
+	//大きさ
+	worldTransform_.scale_ = {0.2f, 0.2f, 0.2f};
+
 }
 
 void Particle::Update() {
-	worldTransform_.TransferMatrix();
+	
+	// 終了なら何もしない
+	if (isFinished_) {
+		return;
+	}
+
+	// カウンターを1フレーム分の秒数進める
+	counter_ += 1.0f / 60.0f;
+
+	// 存続時間の上限に達したら
+	if (counter_ >= kDuration) {
+		counter_ = kDuration;
+		// 終了扱いにする
+		isFinished_ = true;
+	}
 
 	//色変更オブジェクトに色の数値を設定する
 	objectColor_.SetColor(color_);
 
 	//移動
 	worldTransform_.translation_ += velocity_;
-	//行列を定数バッファに転送
-	worldTransform_.TransferMatrix();
-	//行列を更新
+
+	//行列の更新
 	worldTransform_.UpdateMatrix();
 
-	//終了なら何もしない
-	if (isFinished_) {
-		return;
-	}
-	//カウンターを１フレーム粉の秒進める
-	counter_ += 1.0f / 60.0f;
-	//消えるまで進んだら
-	if (counter_ >= kDuration) {
-		counter_ = kDuration;
-		//終了扱いにする
-		isFinished_=true;
-	}
+	//フェード処理
+	color_.w = std::clamp(1.0f - counter_ / kDuration, 0.0f, 1.0f);
+
 }
 
-void Particle::Draw(KamataEngine::Camera& camera) {
+void Particle::Draw(Camera& camera) {
+	// 3Dモデルの描画
 	model_->Draw(worldTransform_, camera, &objectColor_); 
 }
-

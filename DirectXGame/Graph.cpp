@@ -29,7 +29,7 @@ void Graph::Draw() {
 
 	// スプライトの描画
 	Sprite::PreDraw(commandList);
-	greenSprite_->Draw();
 	redSprite_->Draw();
+	greenSprite_->Draw();
 	Sprite::PostDraw();
 }

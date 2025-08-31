@@ -44,11 +44,6 @@ public:
 	/// マッピングする
 	/// </summary>
 	void Map();
-	///
-	/// <summary>
-	/// 行列の更新
-	/// </summary>
-	void UpdateMatrix();
 	/// <summary>
 	/// 行列を転送する
 	/// </summary>
@@ -58,6 +53,12 @@ public:
 	/// </summary>
 	/// <returns>定数バッファ</returns>
 	const Microsoft::WRL::ComPtr<ID3D12Resource>& GetConstBuffer() const { return constBuffer_; }
+
+	/// <summary>
+	/// 行列の更新
+	/// </summary>
+	void UpdateMatrix();
+
 
 private:
 	// 定数バッファ

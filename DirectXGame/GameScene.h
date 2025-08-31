@@ -5,6 +5,8 @@
 #include "Model2.h"
 #include "TitleScene.h"
 #include "Stage.h"
+#include"Player.h"
+#include"Graph.h"
 
 using namespace KamataEngine;
 
@@ -40,5 +42,10 @@ private:
 
 	TitleScene* titleScene_ = nullptr;
 	Stage* stage_ = nullptr;
+	Player* player_ = nullptr;
+
+	Model* playerModel_ = nullptr;
+
+	Graph* graph_=nullptr;
 
 };

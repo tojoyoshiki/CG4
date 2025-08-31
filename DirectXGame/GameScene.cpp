@@ -13,6 +13,7 @@ GameScene::~GameScene() {
 
 	delete titleScene_;
 	delete stage_;
+	delete player_;
 	Model2::StaticFinalize();
 	
 }
@@ -43,6 +44,12 @@ void GameScene::Initialize() {
 	stage_ = new Stage();
 	stage_->Initialize();
 
+	playerModel_ = Model::CreateFromOBJ("cube");
+	player_ = new Player();
+	player_->Initialize(playerModel_);
+
+	graph_ = new Graph();
+	graph_->Initialize();
 }
 
 void GameScene::Update() {
@@ -73,24 +80,35 @@ void GameScene::Update() {
 
 	titleScene_->Update();
 	stage_->Update();
+	player_->Update();
+	graph_->Update();
 }
 
 void GameScene::Draw() {
+
 	//DirectXCommonインスタンスの取得
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 
+	Sprite::PreDraw(dxCommon->GetCommandList());
+	//titleScene_->Draw();
+	stage_->Draw();
+	graph_->Draw();
+
+	Sprite::PostDraw();
+
+	  // 深度バッファクリア
+	dxCommon->ClearDepthBuffer();
+
 	//3Dモデル描画前処理
-	Model2::PreDraw(dxCommon->GetCommandList());
+	Model::PreDraw(dxCommon->GetCommandList());
 
 	//model2_->Draw(worldTransform_, camera_);
+	player_->Draw(camera_);
 
 	// 3Dモデル描画後処理
-	Model2::PostDraw();
+	Model::PostDraw();
 
-	Sprite::PreDraw(dxCommon->GetCommandList());
-	titleScene_->Draw();
-	stage_->Draw();
-	Sprite::PostDraw();
+	
 
 }
 
